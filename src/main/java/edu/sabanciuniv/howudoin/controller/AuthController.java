@@ -9,10 +9,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.jwt.JwtHelper;
+//import org.springframework.security.jwt.JwtHelper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 public class AuthController
@@ -32,7 +34,9 @@ public class AuthController
         this.doAuthenticate(loginRequest.getEmail(), loginRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
         String token = this.jwtHelper.generateToken(userDetails);
-        LoginResponse loginResponse = LoginResponse.builder().token(token).email(userDetails.getUsername()).build(); // email yerine username mi olmali?
+        LoginResponse loginResponse = LoginResponse.builder()
+                .token(token)
+                .email(userDetails.getUsername()).build(); // username yerine email mi olmali?
         return ResponseEntity.ok(loginResponse);
     }
 

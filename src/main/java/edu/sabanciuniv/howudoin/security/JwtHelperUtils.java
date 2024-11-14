@@ -1,4 +1,4 @@
-package edu.sabanciuniv.howudoin.config;
+package edu.sabanciuniv.howudoin.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

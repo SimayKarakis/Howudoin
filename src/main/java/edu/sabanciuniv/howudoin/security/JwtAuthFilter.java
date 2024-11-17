@@ -6,10 +6,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.FilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class JwtAuthFilter extends OncePerRequestFilter // ???
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // JWT authentication filter logic
-
+        /*
         // Step 1: Get the JWT token from the Authorization header
         String token = getTokenFromRequest(request);
 
@@ -47,8 +47,9 @@ public class JwtAuthFilter extends OncePerRequestFilter // ???
 
         // Step 4: Continue the filter chain
         filterChain.doFilter(request, response);
+        */
     }
-
+    /*
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 
@@ -58,4 +59,6 @@ public class JwtAuthFilter extends OncePerRequestFilter // ???
 
         return null;
     }
+    */
+
 }

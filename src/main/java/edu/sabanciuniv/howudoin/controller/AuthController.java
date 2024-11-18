@@ -12,10 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+// @RequestMapping("/auth")
 public class AuthController
 {
     @Autowired
@@ -40,15 +42,12 @@ public class AuthController
         return ResponseEntity.ok(loginResponse);
     }
 
-    private void doAuthenticate(String email, String password)
-    {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-        try
-        {
+    private void doAuthenticate(String email, String password) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(email, password);
+        try {
             authenticationManager.authenticate(authenticationToken);
-        }
-        catch(BadCredentialsException e)
-        {
+        } catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid email or password");
         }
     }

@@ -43,12 +43,4 @@ public class MessagesService
             throw new RuntimeException("Friend not found.");
         }
     }
-    // messages to individuals + messages to groups + messages recieved
-    // OR
-    // messages between two specific users ???
-    // OR
-    // messages sent
-    // OR
-    // messages sent and recieved
-
 }

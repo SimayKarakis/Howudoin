@@ -14,7 +14,7 @@ import java.util.List;
 public class Groups
 {
     @Id
-    private Integer id;
+    private String id;
     private String name;
     private List<Users> groupMemberList;
     private HashMap<Users,String> groupMessageMap;

@@ -1,9 +1,14 @@
 package edu.sabanciuniv.howudoin.controller;
 
+import edu.sabanciuniv.howudoin.config.SecurityConfiguration;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.interfaces.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,10 +21,31 @@ public class UsersController
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public String getCurrentUserEmail()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return userDetails.getUsername(); // Assuming username is the email
+        }
+        return null;
+    }
+
+    // created by chatgpt, check it !!!
+
+
+
+
+
+
     //API Endpoint for registering user
     @PostMapping("/register")
     public boolean register(@RequestBody Users user) throws Exception // I'm returning boolean value here. In the security file it returns user object!!!
     {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersService.registerUser(user);
         System.out.println("User" + user.getName() + user.getLastName() + "is registered.");
         return true;
@@ -31,10 +57,15 @@ public class UsersController
     }
 
     @PostMapping("/friends/add")
-    public boolean sendRequest(@RequestBody int fromUserId, @RequestBody int toUserId)
+    public boolean sendRequest(@RequestBody String toUserId)
     {
+        String userEmail = getCurrentUserEmail();
+        if (userEmail == null) {
+            System.out.println("User not authenticated");
+        }
+
+        Users fromUser = usersRepository.findByEmail(userEmail);
         Users toUser = usersRepository.findById(toUserId).orElse(null);
-        Users fromUser = usersRepository.findById(fromUserId).orElse(null);
 
         if(toUser == null || fromUser == null)
         {
@@ -60,10 +91,15 @@ public class UsersController
     }
 
     @PostMapping("/friends/accept")
-    public boolean acceptRequest(@RequestBody int fromUserId, @RequestBody int toUserId) throws Exception
+    public boolean acceptRequest(@RequestBody String toUserId) throws Exception
     {
+        String userEmail = getCurrentUserEmail();
+        if (userEmail == null) {
+            System.out.println("User not authenticated");
+        }
+
         Users toUser = usersRepository.findById(toUserId).orElse(null);
-        Users fromUser = usersRepository.findById(fromUserId).orElse(null);
+        Users fromUser = usersRepository.findByEmail(userEmail);
 
         if(toUser == null || fromUser == null)
         {
@@ -85,9 +121,14 @@ public class UsersController
     }
 
     @GetMapping("/friends")
-    public List<Users> getFriends(@RequestParam int userId) throws Exception
+    public List<Users> getFriends() throws Exception
     {
-        Users user = usersRepository.findById(userId).orElse(null);
+        String userEmail = getCurrentUserEmail();
+        if (userEmail == null) {
+            System.out.println("User not authenticated");
+        }
+
+        Users user = usersRepository.findByEmail(userEmail);
         return user.getFriendsList();
     }
 }

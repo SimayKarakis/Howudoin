@@ -13,7 +13,6 @@ import jakarta.servlet.FilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 @Component
@@ -28,37 +27,53 @@ public class JwtAuthFilter extends OncePerRequestFilter // ???
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // JWT authentication filter logic
-        /*
-        // Step 1: Get the JWT token from the Authorization header
-        String token = getTokenFromRequest(request);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String requestPath = request.getServletPath();
+        System.out.println("Intercepted request: " + requestPath);
 
-        if (token != null && jwtHelperUtils.validateToken(token, userDetailsService.loadUserByUsername(jwtHelperUtils.getUsernameFromToken(token)))) {
-            String username = jwtHelperUtils.getUsernameFromToken(token);
-
-            // Step 3: Set the authentication in the security context
-            // Create an authentication object and add it to the SecurityContext
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    username, null, new ArrayList<>()); // Assuming no roles for now, can be changed based on your logic
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Skip JWT validation for public endpoints
+        if (requestPath.equals("/register") || requestPath.equals("/login")) {
+            System.out.println("Public endpoint accessed: " + requestPath);
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // Step 4: Continue the filter chain
+        System.out.println("JWT validation required for endpoint: " + requestPath);
+
+        String token = getTokenFromRequest(request);
+        if (token != null) {
+            System.out.println("Token found: " + token);
+
+            String username = jwtHelperUtils.getUsernameFromToken(token);
+            if (username != null) {
+                System.out.println("Username extracted from token: " + username);
+
+                var userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtHelperUtils.validateToken(token, userDetails)) {
+                    System.out.println("Token validated successfully for user: " + username);
+
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("Token validation failed for user: " + username);
+                }
+            } else {
+                System.out.println("Unable to extract username from token.");
+            }
+        } else {
+            System.out.println("No token found in request.");
+        }
+
         filterChain.doFilter(request, response);
-        */
     }
-    /*
+
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // Extract token after "Bearer "
+            return bearerToken.substring(7); // Remove "Bearer " prefix
         }
-
         return null;
     }
-    */
-
 }

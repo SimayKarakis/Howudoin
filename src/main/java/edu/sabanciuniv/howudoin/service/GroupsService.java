@@ -23,7 +23,7 @@ public class GroupsService
         System.out.println("Group '" + group.getName() + "' is created.");
     }
 
-    public void addMemberToGroup(int groupId, Users member)
+    public void addMemberToGroup(String groupId, Users member)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 
@@ -40,7 +40,7 @@ public class GroupsService
         }
     }
 
-    public void sendMessageToGroup(int groupId, Users member, String message)
+    public void sendMessageToGroup(String groupId, Users member, String message)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 
@@ -53,7 +53,7 @@ public class GroupsService
         }
     }
 
-    public HashMap<Users,String> getGroupMessages(int groupId)
+    public HashMap<Users,String> getGroupMessages(String groupId)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 
@@ -69,7 +69,7 @@ public class GroupsService
         }
     }
 
-    public List<Users> getGroupMembers(int groupId)
+    public List<Users> getGroupMembers(String groupId)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 

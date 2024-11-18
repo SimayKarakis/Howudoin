@@ -9,8 +9,8 @@ import java.util.List;
 public class Messages
 {
     @Id
-    private Integer id;
-    private Users from;
+    private String id;
+    private Users from; // we should make them emails or ids because if im sending a messsage to nese, I don't know her password
     private Users to; // what about sending a message to a group
     private List<String> content;
 }

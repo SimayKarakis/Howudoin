@@ -4,6 +4,9 @@ import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.service.MessagesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +24,19 @@ public class MessagesController
         -	POST /messages/send: Send a message to a friend
         -	GET /messages: Retrieve conversation history
     */
+
+    public String getCurrentUserEmail()
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return userDetails.getUsername(); // Assuming username is the email
+        }
+        return null;
+    }
+
+
+
 
     @PostMapping("/messages/send")
     public boolean sendMessage(@RequestBody Messages message) throws Exception

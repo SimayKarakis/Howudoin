@@ -1,6 +1,6 @@
 package edu.sabanciuniv.howudoin.controller;
 
-import edu.sabanciuniv.howudoin.config.SecurityConfiguration;
+import edu.sabanciuniv.howudoin.model.RequestString;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.interfaces.UsersService;
@@ -34,13 +34,6 @@ public class UsersController
         return null;
     }
 
-    // created by chatgpt, check it !!!
-
-
-
-
-
-
     //API Endpoint for registering user
     @PostMapping("/register")
     public boolean register(@RequestBody Users user) throws Exception // I'm returning boolean value here. In the security file it returns user object!!!
@@ -57,15 +50,16 @@ public class UsersController
     }
 
     @PostMapping("/friends/add")
-    public boolean sendRequest(@RequestBody String toUserId)
+    public boolean sendRequest(@RequestBody RequestString requestEmail)
     {
         String userEmail = getCurrentUserEmail();
         if (userEmail == null) {
             System.out.println("User not authenticated");
         }
-
         Users fromUser = usersRepository.findByEmail(userEmail);
-        Users toUser = usersRepository.findById(toUserId).orElse(null);
+
+        String toUserEmail = requestEmail.getRequestedString();
+        Users toUser = usersRepository.findByEmail(toUserEmail);
 
         if(toUser == null || fromUser == null)
         {
@@ -77,51 +71,57 @@ public class UsersController
             System.out.println("You cannot send a friend request to yourself.");
             return false;
         }
-        else if (fromUser.getOutGoingFriendRequestsList().contains(toUser) || toUser.getFriendsList().contains(fromUser)) {
+        else if (fromUser.getOutGoingFriendRequestsList().contains(toUser.getId()) || toUser.getFriendsList().contains(fromUser.getId())) {
             System.out.println("Friend request already sent or you are already friends.");
             return false;
         }
         else
         {
-            toUser.getInComingFriendRequestsList().add(fromUser);
-            fromUser.getOutGoingFriendRequestsList().add(toUser);
-            System.out.println("Friend request sent to" + toUser.getName() + ".");
+            toUser.getInComingFriendRequestsList().add(fromUser.getId());
+            fromUser.getOutGoingFriendRequestsList().add(toUser.getId());
+            usersRepository.save(toUser);
+            usersRepository.save(fromUser);
+            System.out.println("Friend request sent to " + toUser.getName() + ".");
             return true;
         }
     }
 
     @PostMapping("/friends/accept")
-    public boolean acceptRequest(@RequestBody String toUserId) throws Exception
+    public boolean acceptRequest(@RequestBody RequestString receivedUserEmail) throws Exception
     {
-        String userEmail = getCurrentUserEmail();
-        if (userEmail == null) {
+        String currentUserEmail = getCurrentUserEmail();
+        if (currentUserEmail == null) {
             System.out.println("User not authenticated");
         }
+        Users currentUser = usersRepository.findByEmail(currentUserEmail);
 
-        Users toUser = usersRepository.findById(toUserId).orElse(null);
-        Users fromUser = usersRepository.findByEmail(userEmail);
+        String toUserEmail = receivedUserEmail.getRequestedString();
+        Users receivedUser = usersRepository.findByEmail(toUserEmail);
 
-        if(toUser == null || fromUser == null)
+        if(receivedUser == null || currentUser == null)
         {
             System.out.println("User not found");
             return false;
         }
-        else if(!toUser.getInComingFriendRequestsList().contains(fromUser))
+        else if(!currentUser.getInComingFriendRequestsList().contains(receivedUser.getId()))
         {
-            System.out.println("No friend request from" + fromUser.getName() + ".");
+            System.out.println("No friend request from " + currentUser.getName() + ".");
             return false;
         }
         else
         {
-            fromUser.getFriendsList().add(toUser);
-            fromUser.getOutGoingFriendRequestsList().remove(toUser);
-            toUser.getInComingFriendRequestsList().remove(fromUser);
+            currentUser.getFriendsList().add(receivedUser.getId());
+            currentUser.getOutGoingFriendRequestsList().remove(receivedUser.getId());
+            receivedUser.getInComingFriendRequestsList().remove(currentUser.getId());
+            usersRepository.save(currentUser);
+            usersRepository.save(receivedUser);
+            System.out.println("Friend request from " + receivedUser.getName() + " is accepted.");
             return true;
         }
     }
 
     @GetMapping("/friends")
-    public List<Users> getFriends() throws Exception
+    public List<String> getFriends() throws Exception
     {
         String userEmail = getCurrentUserEmail();
         if (userEmail == null) {

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,9 +19,9 @@ public class Users
     private String lastName;
     private String email;
     private String password;
-    private List<Users> friendsList;
-    private List<Users> inComingFriendRequestsList;
-    private List<Users> outGoingFriendRequestsList;
+    private List<String> friendsList = new ArrayList<>();
+    private List<String> inComingFriendRequestsList = new ArrayList<>();
+    private List<String> outGoingFriendRequestsList = new ArrayList<>();
     @CreatedDate
     private LocalDate createdDate;
 }

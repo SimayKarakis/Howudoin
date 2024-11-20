@@ -1,7 +1,6 @@
 package edu.sabanciuniv.howudoin.service;
 
 import edu.sabanciuniv.howudoin.model.Groups;
-import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.GroupsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class GroupsService
         if(wantedGroup.isPresent())
         {
             Groups group = wantedGroup.get();
-            group.getGroupMemberList().add(member);
+            group.getGroupMemberList().add(member.getId());
             groupsRepository.save(group);
             System.out.println("Member '" + member.getName() + "' is added to group '" + group.getName() + "'.");
         }
@@ -40,20 +39,24 @@ public class GroupsService
         }
     }
 
-    public void sendMessageToGroup(String groupId, Users member, String message)
+    public void sendMessageToGroup(String groupId, String memberID, String message)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 
         if(wantedGroup.isPresent())
         {
             Groups group = wantedGroup.get();
-            group.getGroupMessageMap().put(member, message);
+            group.getGroupMessageMap().put(memberID, message);
             groupsRepository.save(group);
             System.out.println("Message is sent to group '" + group.getName() + "'.");
         }
+        else
+        {
+            throw new RuntimeException("Group with ID " + groupId + " does not exist.");
+        }
     }
 
-    public HashMap<Users,String> getGroupMessages(String groupId)
+    public HashMap<String,String> getGroupMessages(String groupId)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 
@@ -69,7 +72,7 @@ public class GroupsService
         }
     }
 
-    public List<Users> getGroupMembers(String groupId)
+    public List<String> getGroupMembers(String groupId)
     {
         Optional<Groups> wantedGroup = groupsRepository.findById(groupId);
 

@@ -1,8 +1,6 @@
 package edu.sabanciuniv.howudoin.controller;
 
-import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.RequestMessage;
-import edu.sabanciuniv.howudoin.model.RequestString;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.MessagesService;
@@ -14,9 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class MessagesController
@@ -44,36 +39,30 @@ public class MessagesController
     @PostMapping("/messages/send")
     public boolean sendMessage(@RequestBody RequestMessage message) throws Exception
     {
-        String userEmail = getCurrentUserEmail();
-        if (userEmail == null) {
+        String fromUserEmail = getCurrentUserEmail();
+        if (fromUserEmail == null) {
             System.out.println("User not authenticated");
             return false;
         }
-        Users fromUser = usersRepository.findByEmail(userEmail);
+        Users fromUser = usersRepository.findByEmail(fromUserEmail);
 
         String toUserEmail = message.getToUserEmail();
         Users toUser = usersRepository.findByEmail(toUserEmail);
 
         String content = message.getContent();
-        messagesService.sendMessageToFriend(fromUser, toUser, content); // Problem is here
+        messagesService.sendMessageToFriend(fromUser, toUser, content);
         return true;
     }
 
     @GetMapping("/messages")
-    public List<String> retrieveConversationHistory(@RequestBody RequestString requestedToUserEmail)
+    public void retrieveConversationHistory()
     {
         String fromUserEmail = getCurrentUserEmail();
         if (fromUserEmail == null)
         {
             System.out.println("User not authenticated");
-            return null;
         }
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
-
-        String toUserEmail = requestedToUserEmail.getRequestedString();
-        Users toUser = usersRepository.findByEmail(toUserEmail);
-
-        return messagesService.retrieveConversations(fromUser, toUser);
+        messagesService.retrieveConversations(fromUser);
     }
-
 }

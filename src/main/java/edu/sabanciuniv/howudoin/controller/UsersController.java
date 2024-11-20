@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class UsersController
 
     //API Endpoint for registering user
     @PostMapping("/register")
-    public boolean register(@RequestBody Users user) throws Exception // I'm returning boolean value here. In the security file it returns user object!!!
+    public boolean register(@RequestBody Users user) throws Exception
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersService.registerUser(user);
@@ -49,7 +50,7 @@ public class UsersController
         return true;
     }
 
-    @GetMapping("/custom-date-search") // should I add this??
+    @GetMapping("/custom-date-search")
     public List<Users> searchCustomAccount(@RequestParam String startDate, @RequestParam String endDate) {
         return usersService.searchCustomUser(startDate, endDate);
     }
@@ -125,9 +126,9 @@ public class UsersController
             usersRepository.save(receivedUser);
 
             Messages conversation = new Messages();
-            conversation.setUserID1(currentUser.getId());
-            conversation.setUserID2(receivedUser.getId());
-            conversation.setContent(Collections.emptyList());
+            conversation.getUsers().add(currentUser.getEmail());
+            conversation.getUsers().add(receivedUser.getEmail());
+            conversation.setContent(new ArrayList<>());
             messagesRepository.save(conversation);
 
             System.out.println("Friend request from " + receivedUser.getName() + " is accepted.");
@@ -142,7 +143,6 @@ public class UsersController
         if (userEmail == null) {
             System.out.println("User not authenticated");
         }
-
         Users user = usersRepository.findByEmail(userEmail);
         return user.getFriendsList();
     }

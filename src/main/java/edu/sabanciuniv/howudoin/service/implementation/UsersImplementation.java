@@ -1,7 +1,5 @@
 package edu.sabanciuniv.howudoin.service.implementation;
 
-// in the security file there is something like "imports **" here, what does it mean?
-
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.interfaces.UsersService;
@@ -24,15 +22,6 @@ public class UsersImplementation implements UsersService
     @Override
     public void registerUser(Users user) throws Exception
     {
-        /*
-        Users newUser = new Users();
-
-        newUser.setId(user.getId());
-        newUser.setLastName(user.getLastName());
-        newUser.setEmail(user.getEmail());
-        newUser.setName(user.getName());
-        newUser.setPassword(user.getPassword());
-        */
         System.out.println("User saved to MongoDB successfully.");
         usersRepository.save(user);
     }

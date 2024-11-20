@@ -5,7 +5,6 @@ import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.userdetails.User;
@@ -20,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            Users user = usersRepository.findByEmail(username); // there is a problem here, should I say email?
+            Users user = usersRepository.findByEmail(username);
             String email = user.getEmail();
             String password = user.getPassword();
             return new User(email, password, new ArrayList<>());

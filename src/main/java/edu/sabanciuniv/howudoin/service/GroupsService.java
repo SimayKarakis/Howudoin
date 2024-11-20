@@ -5,7 +5,6 @@ import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.GroupsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,7 @@ public class GroupsService
         if(wantedGroup.isPresent())
         {
             Groups group = wantedGroup.get();
-            group.getGroupMemberList().add(member.getId());
+            group.getGroupMemberList().add(member.getEmail());
             groupsRepository.save(group);
             System.out.println("Member '" + member.getName() + "' is added to group '" + group.getName() + "'.");
         }

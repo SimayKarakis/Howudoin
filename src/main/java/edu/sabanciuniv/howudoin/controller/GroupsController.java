@@ -43,6 +43,12 @@ public class GroupsController
     @PostMapping("/groups/create")
     public boolean createGroup(@RequestBody Groups group)
     {
+        String currentUserEmail = getCurrentUserEmail();
+        if (currentUserEmail == null) {
+            System.out.println("User not authenticated");
+        }
+
+        group.getGroupMemberList().add(currentUserEmail);
         groupsService.addGroup(group);
         return true;
     }

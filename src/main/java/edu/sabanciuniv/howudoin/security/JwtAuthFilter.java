@@ -16,7 +16,7 @@ import java.io.IOException;
 
 
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter // ???
+public class JwtAuthFilter extends OncePerRequestFilter
 {
     private Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 

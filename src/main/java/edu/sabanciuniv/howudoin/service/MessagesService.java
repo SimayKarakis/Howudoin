@@ -1,6 +1,5 @@
 package edu.sabanciuniv.howudoin.service;
 
-import edu.sabanciuniv.howudoin.model.Groups;
 import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.MessagesRepository;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MessagesService
@@ -25,39 +23,25 @@ public class MessagesService
         {
             if (user1.getFriendsList().contains(user2.getId()))
             {
+                if (user1 != user2)
+                {
+                    List<Messages> conversation = messagesRepository.findAll();
 
-                if (user1 == user2)
-                {
-                    throw new RuntimeException("You cannot send a message to yourself.");
-                }
-                else
-                {
-                    List<Messages> conversation = messagesRepository.findByUserID1AndUserID2(user1.getId(), user2.getId());
-                    if(conversation.isEmpty())
+                    for (Messages message : conversation)
                     {
-                        conversation = messagesRepository.findByUserID1AndUserID2(user2.getId(), user1.getId());
-                        if(conversation.isEmpty())
-                        {
-                            System.out.println("Conversation not found");
-                        }
-                        else
-                        {
-                            for (Messages message : conversation)
-                            {
-                                message.getContent().add(content);
-                                messagesRepository.save(message);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (Messages message : conversation)
+                        if(message.getUsers().contains(user1.getEmail()) && message.getUsers().contains(user2.getEmail()))
                         {
                             message.getContent().add(content);
                             messagesRepository.save(message);
+                            break;
                         }
                     }
+
                     System.out.println("Message is sent.");
+                }
+                else
+                {
+                    throw new RuntimeException("You cannot send a message to yourself.");
                 }
             }
             else
@@ -70,32 +54,18 @@ public class MessagesService
             throw new RuntimeException("User not found.");
         }
     }
-    public List<String> retrieveConversations(Users fromUser, Users toUser)
+    public void retrieveConversations(Users user1)
     {
-        List<Messages> conversation = messagesRepository.findByUserID1AndUserID2(fromUser.getId(), toUser.getId());
-        if(conversation == null)
+        List<Messages> conversation = messagesRepository.findAll();
+
+        for (Messages message : conversation)
         {
-            conversation = messagesRepository.findByUserID1AndUserID2(toUser.getId(), fromUser.getId());
-            if(conversation == null)
+            if(message.getUsers().contains(user1.getEmail()))
             {
-                System.out.println("Conversation not found");
-                return null;
-            }
-            else
-            {
-                for (Messages message : conversation)
-                {
-                    return message.getContent();
-                }
+                System.out.println("Messages between " + message.getUsers());
+                System.out.println(message.getContent());
+                System.out.println();
             }
         }
-        else
-        {
-            for (Messages message : conversation)
-            {
-                return message.getContent();
-            }
-        }
-        return List.of();
     }
 }

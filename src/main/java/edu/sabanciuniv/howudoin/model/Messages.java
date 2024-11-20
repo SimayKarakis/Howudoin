@@ -1,11 +1,14 @@
 package edu.sabanciuniv.howudoin.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 @Document(collection = "Messages")
 public class Messages
 {
@@ -14,6 +17,4 @@ public class Messages
     private String UserID1;
     private String UserID2;
     private List<String> content;
-    // This hashmap element's has the key 1 if the message is coming from user 1 to user 2
-    // and 2 if the message is coming from user 2 to user 1.
 }

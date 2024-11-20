@@ -19,40 +19,43 @@ public class MessagesService
     @Autowired
     private UsersRepository usersRepository;
 
-    public void sendMessageToFriend(Users user1, String user2ID, String messageContent)
+    public void sendMessageToFriend(Users user1, Users user2, String content)
     {
-        Optional<Users> toUser = usersRepository.findById(user2ID);
-        if (toUser.isPresent())
+        if (user2 != null)
         {
-            Users friend = toUser.get();
-
-            if (user1.getFriendsList().contains(user2ID))
+            if (user1.getFriendsList().contains(user2.getId()))
             {
 
-                if (user1 == friend)
+                if (user1 == user2)
                 {
                     throw new RuntimeException("You cannot send a message to yourself.");
                 }
                 else
                 {
-                    Messages conversation = messagesRepository.findByUserID1AndUserID2(user1.getId(), user2ID);
-                    if(conversation == null)
+                    List<Messages> conversation = messagesRepository.findByUserID1AndUserID2(user1.getId(), user2.getId());
+                    if(conversation.isEmpty())
                     {
-                        conversation = messagesRepository.findByUserID1AndUserID2(user2ID, user1.getId());
-                        if(conversation == null)
+                        conversation = messagesRepository.findByUserID1AndUserID2(user2.getId(), user1.getId());
+                        if(conversation.isEmpty())
                         {
                             System.out.println("Conversation not found");
                         }
                         else
                         {
-                            conversation.getContent().add(messageContent);
-                            messagesRepository.save(conversation);
+                            for (Messages message : conversation)
+                            {
+                                message.getContent().add(content);
+                                messagesRepository.save(message);
+                            }
                         }
                     }
                     else
                     {
-                        conversation.getContent().add(messageContent);
-                        messagesRepository.save(conversation);
+                        for (Messages message : conversation)
+                        {
+                            message.getContent().add(content);
+                            messagesRepository.save(message);
+                        }
                     }
                     System.out.println("Message is sent.");
                 }
@@ -69,7 +72,7 @@ public class MessagesService
     }
     public List<String> retrieveConversations(Users fromUser, Users toUser)
     {
-        Messages conversation = messagesRepository.findByUserID1AndUserID2(fromUser.getId(), toUser.getId());
+        List<Messages> conversation = messagesRepository.findByUserID1AndUserID2(fromUser.getId(), toUser.getId());
         if(conversation == null)
         {
             conversation = messagesRepository.findByUserID1AndUserID2(toUser.getId(), fromUser.getId());
@@ -80,12 +83,19 @@ public class MessagesService
             }
             else
             {
-                return conversation.getContent();
+                for (Messages message : conversation)
+                {
+                    return message.getContent();
+                }
             }
         }
         else
         {
-            return conversation.getContent();
+            for (Messages message : conversation)
+            {
+                return message.getContent();
+            }
         }
+        return List.of();
     }
 }

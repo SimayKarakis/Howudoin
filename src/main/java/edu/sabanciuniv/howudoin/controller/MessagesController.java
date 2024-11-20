@@ -1,6 +1,7 @@
 package edu.sabanciuniv.howudoin.controller;
 
 import edu.sabanciuniv.howudoin.model.Messages;
+import edu.sabanciuniv.howudoin.model.RequestMessage;
 import edu.sabanciuniv.howudoin.model.RequestString;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
@@ -41,7 +42,7 @@ public class MessagesController
     }
 
     @PostMapping("/messages/send")
-    public boolean sendMessage(@RequestBody RequestString toUserID, @RequestBody RequestString messageContent) throws Exception
+    public boolean sendMessage(@RequestBody RequestMessage message) throws Exception
     {
         String userEmail = getCurrentUserEmail();
         if (userEmail == null) {
@@ -50,9 +51,11 @@ public class MessagesController
         }
         Users fromUser = usersRepository.findByEmail(userEmail);
 
-        String toUserID2 = toUserID.getRequestedString();
-        String content = messageContent.getRequestedString();
-        messagesService.sendMessageToFriend(fromUser, toUserID2, content);
+        String toUserEmail = message.getToUserEmail();
+        Users toUser = usersRepository.findByEmail(toUserEmail);
+
+        String content = message.getContent();
+        messagesService.sendMessageToFriend(fromUser, toUser, content); // Problem is here
         return true;
     }
 

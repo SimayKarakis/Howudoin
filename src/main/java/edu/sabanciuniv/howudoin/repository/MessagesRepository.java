@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface MessagesRepository extends MongoRepository<Messages, String> {
-    Messages findByUserID1AndUserID2(String fromUserID, String toUserID);
+    List<Messages> findByUserID1AndUserID2(String fromUserID, String toUserID);
 }

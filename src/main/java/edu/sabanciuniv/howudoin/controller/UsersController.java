@@ -1,7 +1,9 @@
 package edu.sabanciuniv.howudoin.controller;
 
+import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.RequestString;
 import edu.sabanciuniv.howudoin.model.Users;
+import edu.sabanciuniv.howudoin.repository.MessagesRepository;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.interfaces.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,8 @@ public class UsersController
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private MessagesRepository messagesRepository;
 
     public String getCurrentUserEmail()
     {
@@ -111,10 +116,20 @@ public class UsersController
         else
         {
             currentUser.getFriendsList().add(receivedUser.getId());
-            currentUser.getOutGoingFriendRequestsList().remove(receivedUser.getId());
-            receivedUser.getInComingFriendRequestsList().remove(currentUser.getId());
+            receivedUser.getFriendsList().add(currentUser.getId());
+
+            currentUser.getInComingFriendRequestsList().remove(receivedUser.getId());
+            receivedUser.getOutGoingFriendRequestsList().remove(currentUser.getId());
+
             usersRepository.save(currentUser);
             usersRepository.save(receivedUser);
+
+            Messages conversation = new Messages();
+            conversation.setUserID1(currentUser.getId());
+            conversation.setUserID2(receivedUser.getId());
+            conversation.setContent(Collections.emptyList());
+            messagesRepository.save(conversation);
+
             System.out.println("Friend request from " + receivedUser.getName() + " is accepted.");
             return true;
         }

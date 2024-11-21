@@ -78,9 +78,20 @@ public class GroupsController
     }
 
     @GetMapping("/groups/{id}/messages")
-    public HashMap<String,String> getMessages(@PathVariable("id") String groupId)
-    {
-        return groupsService.getGroupMessages(groupId);
+    public HashMap<String, String> getMessages(@PathVariable("id") String groupId) {
+        HashMap<String, String> messages = groupsService.getGroupMessages(groupId);
+        HashMap<String, String> messagesWithEmails = new HashMap<>();
+
+        for (String userId : messages.keySet()) {
+            Users user = usersRepository.findById(userId).orElse(null);
+            if (user != null) {
+                messagesWithEmails.put(user.getEmail(), messages.get(userId));
+            } else {
+                messagesWithEmails.put("Unknown User", messages.get(userId));
+            }
+        }
+
+        return messagesWithEmails;
     }
 
     @GetMapping("/groups/{id}/members")

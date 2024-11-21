@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 @RestController
 public class MessagesController
 {
@@ -55,14 +57,14 @@ public class MessagesController
     }
 
     @GetMapping("/messages")
-    public void retrieveConversationHistory()
-    {
+    public HashMap<String, String> retrieveConversationHistory() {
         String fromUserEmail = getCurrentUserEmail();
-        if (fromUserEmail == null)
-        {
-            System.out.println("User not authenticated");
+        if (fromUserEmail == null) {
+            throw new RuntimeException("User not authenticated");
         }
+
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
-        messagesService.retrieveConversations(fromUser);
+        return messagesService.retrieveConversations(fromUser);
     }
+
 }

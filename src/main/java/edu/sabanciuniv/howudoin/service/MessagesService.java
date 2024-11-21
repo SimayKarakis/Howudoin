@@ -7,6 +7,7 @@ import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -54,18 +55,24 @@ public class MessagesService
             throw new RuntimeException("User not found.");
         }
     }
-    public void retrieveConversations(Users user1)
-    {
-        List<Messages> conversation = messagesRepository.findAll();
+    public HashMap<String, String> retrieveConversations(Users user1) {
+        List<Messages> allMessages = messagesRepository.findAll();
+        HashMap<String, String> conversationMap = new HashMap<>();
 
-        for (Messages message : conversation)
-        {
-            if(message.getUsers().contains(user1.getEmail()))
-            {
-                System.out.println("Messages between " + message.getUsers());
-                System.out.println(message.getContent());
-                System.out.println();
+        for (Messages message : allMessages) {
+            if (message.getUsers().contains(user1.getEmail())) {
+                List<String> users = message.getUsers();
+                List<String> contents = message.getContent();
+
+                // Associate each message in content with the corresponding user
+                for (int i = 0; i < contents.size(); i++) {
+                    String senderEmail = users.get(i % users.size()); // Alternate between users if needed
+                    conversationMap.put(senderEmail, contents.get(i));
+                }
             }
         }
+
+        return conversationMap;
     }
+
 }

@@ -44,7 +44,7 @@ public class UsersController
     {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersService.registerUser(user);
-        System.out.println("User" + user.getName() + user.getLastName() + "is registered.");
+        System.out.println("User " + user.getName() + " " + user.getLastName() + " is registered.");
         return true;
     }
 
@@ -62,7 +62,7 @@ public class UsersController
         }
         Users fromUser = usersRepository.findByEmail(userEmail);
 
-        String toUserEmail = requestEmail.getRequestedString();
+        String toUserEmail = requestEmail.getS();
         Users toUser = usersRepository.findByEmail(toUserEmail);
 
         if(toUser == null || fromUser == null)
@@ -90,8 +90,31 @@ public class UsersController
         }
     }
 
+    @GetMapping("/friends/incoming")
+    public List<String> getFriendRequests() throws Exception
+    {
+        String userEmail = getCurrentUserEmail();
+        if (userEmail == null) {
+            System.out.println("User not authenticated");
+        }
+        Users user = usersRepository.findByEmail(userEmail);
+
+        List<String> friendNames = new ArrayList<>();
+        if(user.getInComingFriendRequestsList().isEmpty())
+        {
+            System.out.println("No friend requests found");
+            return null;
+        }
+
+        for(String ids : user.getInComingFriendRequestsList()){
+            Users friend = usersRepository.findById(ids).orElse(null);
+            friendNames.add(friend.getName() + " " + friend.getLastName());
+        }
+        return friendNames;
+    }
+
     @PostMapping("/friends/accept")
-    public boolean acceptRequest(@RequestBody RequestString receivedUserEmail) throws Exception
+    public boolean acceptRequest(@RequestBody RequestString requestName) throws Exception
     {
         String currentUserEmail = getCurrentUserEmail();
         if (currentUserEmail == null) {
@@ -99,8 +122,9 @@ public class UsersController
         }
         Users currentUser = usersRepository.findByEmail(currentUserEmail);
 
-        String toUserEmail = receivedUserEmail.getRequestedString();
-        Users receivedUser = usersRepository.findByEmail(toUserEmail);
+        String name = requestName.getS();
+        String userName = name.substring(0, name.indexOf(' '));
+        Users receivedUser = usersRepository.findByName(userName);
 
         if(receivedUser == null || currentUser == null)
         {
@@ -141,12 +165,12 @@ public class UsersController
         if (userEmail == null) {
             System.out.println("User not authenticated");
         }
-
         Users user = usersRepository.findByEmail(userEmail);
+
         List<String> friendNames = new ArrayList<>();
-        for(String emails : user.getFriendsList()){
-            Users friend = usersRepository.findByEmail(emails);
-            friendNames.add(friend.getName());
+        for(String ids : user.getFriendsList()){
+            Users friend = usersRepository.findById(ids).orElse(null);
+            friendNames.add(friend.getName() + " " + friend.getLastName());
         }
         return friendNames;
     }

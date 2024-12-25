@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +52,10 @@ public class GroupsController
             return false;
         }
         group.getGroupMemberList().add(currentUserEmail);
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("Europe/Istanbul"));
+        group.setCreatedDate(zonedDateTime.toLocalDateTime());
+
         groupsService.addGroup(group);
 
         currentUser.getGroupsList().add(group.getId());
@@ -60,8 +66,9 @@ public class GroupsController
     @PostMapping("/groups/{id}/add-member")
     public boolean addMember(@PathVariable("id") String groupId, @RequestBody RequestString memberEmail)
     {
-        String toUserEmail = memberEmail.getRequestedString();
-        Users toUser = usersRepository.findByEmail(toUserEmail);
+        String email = memberEmail.getS();
+        Users toUser = usersRepository.findByEmail(email);
+
         toUser.getGroupsList().add(groupId);
         usersRepository.save(toUser);
 
@@ -78,7 +85,7 @@ public class GroupsController
         }
         Users fromUser = usersRepository.findByEmail(userEmail);
 
-        String message = requestedMessage.getRequestedString();
+        String message = requestedMessage.getS();
         groupsService.sendMessageToGroup(groupId, fromUser.getId(), message);
         return true;
     }

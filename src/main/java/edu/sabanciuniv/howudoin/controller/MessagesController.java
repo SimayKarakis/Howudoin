@@ -55,14 +55,16 @@ public class MessagesController
     }
 
     @GetMapping("/messages")
-    public LinkedHashMap<String, String> retrieveConversationHistory(@RequestParam String friendName) {
+    public LinkedHashMap<String, String> retrieveConversationHistory(@RequestBody RequestString requestEmail) {
         String fromUserEmail = getCurrentUserEmail();
         if (fromUserEmail == null) {
             throw new RuntimeException("User not authenticated");
         }
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
 
-        Users friend = usersRepository.findByName(friendName);
+        String email = requestEmail.getS();
+        Users friend = usersRepository.findByEmail(email);
+
         if(friend == null) {
             throw new RuntimeException("Friend not found");
         }

@@ -46,8 +46,9 @@ public class MessagesController
         }
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
 
-        String toUserEmail = message.getToUserEmail();
-        Users toUser = usersRepository.findByEmail(toUserEmail);
+        String nameLastname = message.getS();
+        String userName = nameLastname.substring(0, nameLastname.indexOf(' '));
+        Users toUser = usersRepository.findByName(userName);
 
         String content = message.getContent();
         messagesService.sendMessageToFriend(fromUser, toUser, content);
@@ -55,15 +56,16 @@ public class MessagesController
     }
 
     @GetMapping("/messages")
-    public LinkedHashMap<String, String> retrieveConversationHistory(@RequestBody RequestString requestEmail) {
+    public LinkedHashMap<String, String> retrieveConversationHistory(@RequestParam String requestNameLastname) throws Exception {
         String fromUserEmail = getCurrentUserEmail();
         if (fromUserEmail == null) {
             throw new RuntimeException("User not authenticated");
         }
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
 
-        String email = requestEmail.getS();
-        Users friend = usersRepository.findByEmail(email);
+        //String name = requestNameLastname.getS();
+        String userName = requestNameLastname.substring(0, requestNameLastname.indexOf(' '));
+        Users friend = usersRepository.findByName(userName);
 
         if(friend == null) {
             throw new RuntimeException("Friend not found");

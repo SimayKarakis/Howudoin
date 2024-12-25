@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class RequestMessage
 {
-    private String toUserEmail;
+    private String s;
     private String content;
 }

@@ -150,7 +150,7 @@ public class UsersController
             Messages conversation = new Messages();
             conversation.getUsers().add(currentUser.getEmail());
             conversation.getUsers().add(receivedUser.getEmail());
-            conversation.setContent(new LinkedHashMap<String, String >());
+            //conversation.setContent(new List<Messages.MessageEntry>());
             messagesRepository.save(conversation);
 
             System.out.println("Friend request from " + receivedUser.getName() + " is accepted.");

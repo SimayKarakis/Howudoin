@@ -32,7 +32,7 @@ public class MessagesService
                     {
                         if(message.getUsers().contains(user1.getEmail()) && message.getUsers().contains(user2.getEmail()))
                         {
-                            message.getContent().put(user1.getName(), content);
+                            message.getContent().add(new Messages.MessageEntry(user1.getName() + " " + user1.getLastName(), content));
                             messagesRepository.save(message);
                             break;
                         }
@@ -56,12 +56,12 @@ public class MessagesService
         }
     }
 
-    public LinkedHashMap<String, String> retrieveConversations(Users user1, Users friend) {
+    public List<Messages.MessageEntry> retrieveConversations(Users user1, Users friend) {
         List<Messages> allMessages = messagesRepository.findAll();
 
         for (Messages message : allMessages) {
             if (message.getUsers().contains(user1.getEmail()) && message.getUsers().contains(friend.getEmail())) {
-                LinkedHashMap<String, String> content =  message.getContent();
+                List<Messages.MessageEntry> content =  message.getContent();
                 if(content != null && !content.isEmpty()){
                     return content;
                 }

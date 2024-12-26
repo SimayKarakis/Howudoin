@@ -1,7 +1,7 @@
 package edu.sabanciuniv.howudoin.controller;
 
+import edu.sabanciuniv.howudoin.model.Messages;
 import edu.sabanciuniv.howudoin.model.RequestMessage;
-import edu.sabanciuniv.howudoin.model.RequestString;
 import edu.sabanciuniv.howudoin.model.Users;
 import edu.sabanciuniv.howudoin.repository.UsersRepository;
 import edu.sabanciuniv.howudoin.service.MessagesService;
@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 @RestController
 public class MessagesController
@@ -56,14 +57,13 @@ public class MessagesController
     }
 
     @GetMapping("/messages")
-    public LinkedHashMap<String, String> retrieveConversationHistory(@RequestParam String requestNameLastname) throws Exception {
+    public List<Messages.MessageEntry> retrieveConversationHistory(@RequestParam String requestNameLastname) throws Exception {
         String fromUserEmail = getCurrentUserEmail();
         if (fromUserEmail == null) {
             throw new RuntimeException("User not authenticated");
         }
         Users fromUser = usersRepository.findByEmail(fromUserEmail);
 
-        //String name = requestNameLastname.getS();
         String userName = requestNameLastname.substring(0, requestNameLastname.indexOf(' '));
         Users friend = usersRepository.findByName(userName);
 

@@ -24,4 +24,8 @@ public class Users
     private List<String> outGoingFriendRequestsList = new ArrayList<>();
     @CreatedDate
     private LocalDate createdDate;
+
+    public String getEmail() {
+        return email;
+    }
 }

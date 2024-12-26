@@ -137,13 +137,21 @@ public class UsersController
     }
 
     @GetMapping("/friends")
-    public List<String> getFriends() throws Exception
-    {
+    public List<String> getFriends() throws Exception {
         String userEmail = getCurrentUserEmail();
         if (userEmail == null) {
             System.out.println("User not authenticated");
+            return Collections.emptyList(); // Return empty list instead of null
         }
+
         Users user = usersRepository.findByEmail(userEmail);
-        return user.getFriendsList();
+
+        List<String> friendEmails = new ArrayList<>();
+        for (String friendId : user.getFriendsList()) {
+            Users friend = usersRepository.findById(friendId).get(); // Fetch user by ID
+            friendEmails.add(friend.getEmail()); // Extract email
+        }
+
+        return friendEmails;
     }
 }
